@@ -37,8 +37,7 @@ export const getCourseSlotsRoute = `${host}/academic-procedures/api/acad/get_add
 export const getCoursesRoute = `${host}/academic-procedures/api/acad/get_add_courses/`;
 export const replacement_excel = `${host}/academic-procedures/api/upload-excel_relacement/`;
 export const editStudentCourseRoute = "/academic-procedures/api/editcourseadmin/";
-export const getSingleCourseRoute   = "/academic-procedures/api/studentcourse/";
-export const semesterOptionsRoute = `${host}/academic-procedures/api/stu/course_reg/semesters/` 
+export const getSingleCourseRoute   = "/academic-procedures/api/studentcourse/";  
 
 // HOD
 export const HOD_STUDENTS_URL       = `${host}/academic-procedures/api/hod/students/?role=hod`;
@@ -76,19 +75,45 @@ export const studentDropCourseRoute     = `${host}/academic-procedures/api/stu/d
 
 export const StudentSearchRoute     = `${host}/academic-procedures/api/acad/student-search/`;
 
-export const studentQuestionsRoute = `${host}/academic-procedures/api/stu/feedback_questions/`;
-export const studentSubmitRoute  = `${host}/academic-procedures/api/stu/feedback_submit/`;
 
-export const instCoursesRoute  = `${host}/academic-procedures/api/inst/courses/`;
-export const instAllStatsRoute  = `${host}/academic-procedures/api/inst/stats/all/`;
+export const studentThesisRoute         = `${host}/academic-procedures/api/stu/thesis/`;
+export const studentThesisDownloadRoute = `${host}/academic-procedures/api/stu/thesis/download/`;
 
-export const adminCoursesRoute    = `${host}/academic-procedures/api/acad/feedback_courses/`;
-export const adminAllStatsRoute = `${host}/academic-procedures/api/acad/stats/all/`;
+export const facultyListRoute           = `${host}/academic-procedures/api/faculty/`;
 
-export const listBatchesRoute   = `${host}/academic-procedures/api/acad/batch_change/batches/`;
-export const listStudentsRoute  = `${host}/academic-procedures/api/acad/batch_change/students/`;
-export const applyBatchRoute    = `${host}/academic-procedures/api/acad/batch_change/apply/`;
+export const supervisorDashboardRoute   = `${host}/academic-procedures/api/supervisor/dashboard/`;
+export const supervisorReviewRoute      = (id) => `${host}/academic-procedures/api/supervisor/thesis/${id}/review/`;
+
+export const hodDashboardRoute          = `${host}/academic-procedures/api/hod/dashboard/`;
+export const hodReviewRoute             = (id) => `${host}/academic-procedures/api/hod/thesis/${id}/review/`;
+
+export const deanDashboardRoute         = `${host}/academic-procedures/api/dean/dashboard/`;
+export const deanReviewRoute            = (id) => `${host}/academic-procedures/api/dean/thesis/${id}/review/`;
+export const deanGeneratePdfRoute       = (id) => `${host}/academic-procedures/api/dean/thesis/${id}/generate/`;
+
+// Seminar 
+
+export const studentSeminarListRoute    = `${host}/academic-procedures/api/seminar-reports/`;
+export const studentSeminarCreateRoute  = id => `${host}/academic-procedures/api/seminar-reports/create/${id}/`;
+export const studentSeminarDetailRoute  = id => `${host}/academic-procedures/api/seminar-reports/${id}/`;
+
+export const rpcSeminarListRoute     = `${host}/academic-procedures/api/seminar-reports/list/`;
+export const rpcSeminarDetailRoute      = id => `${host}/academic-procedures/api/seminar-reports/${id}/rpc-detail/`;
+export const rpcSeminarConsentRoute     = id => `${host}/academic-procedures/api/seminar-reports/${id}/rpc-consent/`;
+export const rpcSeminarFinalizeRoute    = id => `${host}/academic-procedures/api/seminar-reports/${id}/rpc-finalize/`;
 
 
-export const listStudentsPromoteRoute = `${host}/academic-procedures/api/acad/promote/students/`;
-export const applyPromoteRoute = `${host}/academic-procedures/api/acad/promote/apply/`;
+
+// Thesis Submission
+export const thesisSubmitRoute           = `${host}/academic-procedures/api/thesis/submit/`;
+
+/** Supervisor */
+export const supervisorDashboardRouteThesisSubmission = `${host}/academic-procedures/api/thesis/supervisor-dashboard/`;
+export const supervisorSubmissionDetailRoute = (id) => `${host}/academic-procedures/api/thesis/submission-detail/${id}/`;
+export const supervisorAssignRoute = `${host}/academic-procedures/api/thesis/supervisor-assign/`;
+/** Director */
+export const directorDashboardRoute = `${host}/academic-procedures/api/thesis/director-dashboard/`;
+export const directorApproveRoute = `${host}/academic-procedures/api/thesis/director-approve/`;
+
+export const invitationActionRoute       = token => `${host}/academic-procedures/api/invitation/${token}/`;
+export const reviewDetailRoute           = token => `${host}/academic-procedures/api/review/${token}/`;

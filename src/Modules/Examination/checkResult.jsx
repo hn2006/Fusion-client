@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState } from "react";
 import {
   Card,
   Paper,
@@ -15,14 +15,11 @@ import {
   Title,
 } from "@mantine/core";
 import axios from "axios";
-import { get_result_semesters, check_result } from "./routes/examinationRoutes";
+import { check_result } from "./routes/examinationRoutes";
 
 export default function CheckResult() {
-  // semester picker
+  // Holds the raw JSON string of { no, type }
   const [selection, setSelection] = useState(null);
-  const [semesters, setSemesters] = useState([]);
-  
-  // result & UI state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [courses, setCourses] = useState([]);
@@ -32,38 +29,21 @@ export default function CheckResult() {
   const [tu, setTu] = useState(0);
   const [show, setShow] = useState(false);
 
-  // 1) Fetch semesters on mount
-  useEffect(() => {
-    async function fetchSemesters() {
-      try {
-        const token = localStorage.getItem("authToken");
-        const { data } = await axios.get(get_result_semesters, {
-          headers: { Authorization: `Token ${token}` },
-        });
-        if (data.success) {
-          setSemesters(data.semesters);
-        } else {
-          setError(data.message || "Could not load semesters");
-        }
-      } catch (err) {
-        console.error(err);
-        setError("Failed to fetch semesters");
-      }
-    }
-    fetchSemesters();
-  }, []);
+  const semesterOptions = [
+    { value: JSON.stringify({ no: 1, type: "Odd Semester" }), label: "Semester 1" },
+    { value: JSON.stringify({ no: 2, type: "Even Semester" }), label: "Semester 2" },
+    { value: JSON.stringify({ no: 3, type: "Summer Semester" }), label: "Summer 1" },
+    { value: JSON.stringify({ no: 4, type: "Odd Semester" }), label: "Semester 3" },
+    { value: JSON.stringify({ no: 5, type: "Even Semester" }), label: "Semester 4" },
+    { value: JSON.stringify({ no: 6, type: "Summer Semester" }), label: "Summer 2" },
+    { value: JSON.stringify({ no: 7, type: "Odd Semester" }), label: "Semester 5" },
+    { value: JSON.stringify({ no: 8, type: "Even Semester" }), label: "Semester 6" },
+    { value: JSON.stringify({ no: 9, type: "Summer Semester" }), label: "Summer 3" },
+    { value: JSON.stringify({ no: 10, type: "Odd Semester" }), label: "Semester 7" },
+    { value: JSON.stringify({ no: 11, type: "Even Semester" }), label: "Semester 8" },
+    { value: JSON.stringify({ no: 12, type: "Summer Semester" }), label: "Summer 4" },
+  ];
 
-  // 2) Build Select options
-  const semesterOptions = useMemo(
-    () =>
-      semesters.map(({ semester_no, semester_type, label }) => ({
-        value: JSON.stringify({ no: semester_no, type: semester_type }),
-        label,
-      })),
-    [semesters]
-  );
-
-  // 3) Handle View Result
   const handleSearch = async () => {
     if (!selection) {
       setError("Please select a semester.");
@@ -73,6 +53,7 @@ export default function CheckResult() {
     setLoading(true);
     setShow(false);
 
+    // Parse our stored JSON
     const { no: semester_no, type: semester_type } = JSON.parse(selection);
 
     try {
@@ -82,6 +63,7 @@ export default function CheckResult() {
         { semester_no, semester_type },
         { headers: { Authorization: `Token ${token}` } }
       );
+
       if (!data.success) {
         setError(data.message || "Cannot fetch results.");
       } else {
@@ -100,14 +82,12 @@ export default function CheckResult() {
     }
   };
 
-  // 4) Render rows
-  const rows = courses.map((c, i) => (
-    <tr key={i}>
+  const rows = courses.map((c, idx) => (
+    <tr key={idx}>
       <td>{c.coursecode}</td>
       <td>{c.coursename}</td>
       <td>{c.credits}</td>
       <td>{c.grade}</td>
-      <td>{c.points}</td>
     </tr>
   ));
 
@@ -115,6 +95,7 @@ export default function CheckResult() {
     <Card withBorder p="lg" radius="md">
       <Paper p="md">
         <Title order={3} mb="md">Check Result</Title>
+
         {error && <Alert color="red" mb="md">{error}</Alert>}
 
         <Grid>
@@ -146,6 +127,7 @@ export default function CheckResult() {
           <Box mt="xl">
             <Paper p="md" withBorder mb="md">
               <Title order={4}>
+                {/* Display human-readable label again */}
                 {semesterOptions.find(o => o.value === selection)?.label}
               </Title>
             </Paper>
@@ -158,7 +140,6 @@ export default function CheckResult() {
                     <th>Course Name</th>
                     <th>Credits</th>
                     <th>Grade</th>
-                    <th>Grade Points</th>
                   </tr>
                 </thead>
                 <tbody>{rows}</tbody>
@@ -169,14 +150,14 @@ export default function CheckResult() {
               {[
                 { label: "SPI", value: spi },
                 { label: "CPI", value: cpi },
-                { label: "SU",  value: su  },
-                { label: "TU",  value: tu  },
+                { label: "SU", value: su },
+                { label: "TU", value: tu },
               ].map((stat, i) => (
                 <Grid.Col span={3} key={i}>
                   <Paper p="md" withBorder>
                     <Title order={5}>{stat.label}</Title>
                     <Text weight={700} size="xl" mt="md">
-                      {stat.value ?? "N/A"}
+                      {stat.value || "N/A"}
                     </Text>
                   </Paper>
                 </Grid.Col>

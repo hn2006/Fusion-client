@@ -42,28 +42,33 @@ export default function StudentCourses() {
   const [studentData, setStudentData] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [dropModalOpen, setDropModalOpen] = useState(false);
   const [courseToDrop, setCourseToDrop] = useState(null);
   const [courseToDropName, setCourseToDropName] = useState("");
+
   const [semSlots, setSemSlots] = useState([]);
   const [slotCourses, setSlotCourses] = useState([]);
   const [academicYears, setAcademicYears] = useState([]);
+
+  // store selected semester as an object { no, type }
   const [selectedSemester, setSelectedSemester] = useState(
     JSON.parse(semesterOptions[0].value)
   );
+
   const [newCourse, setNewCourse] = useState({
     semester_id: null,
-    semester_no: null,
-    semester_type: null,
     courseslot_id: null,
     course_id: null,
     academic_year: null,
     registration_type: null,
     old_course: null,
+    semester_type: null,
   });
 
   useEffect(() => {
+    // build last 5 academic years array
     const now = new Date();
     const year = now.getFullYear();
     const start = now.getMonth() >= 6 ? year : year - 1;
@@ -137,20 +142,20 @@ export default function StudentCourses() {
     clearError();
     const {
       semester_id,
-      semester_type,
       courseslot_id,
       course_id,
       academic_year,
       registration_type,
       old_course,
+      semester_type,
     } = newCourse;
     if (
       !semester_id ||
-      !semester_type ||
       !courseslot_id ||
       !course_id ||
       !academic_year ||
-      !registration_type
+      !registration_type ||
+      !semester_type
     ) {
       return setError("Fill all required fields");
     }
@@ -160,11 +165,11 @@ export default function StudentCourses() {
     const form = new FormData();
     form.append("roll_no", rollNo);
     form.append("semester_id", semester_id);
-    form.append("semester_type", semester_type);
     form.append("courseslot_id", courseslot_id);
     form.append("course_id", course_id);
     form.append("academic_year", academic_year);
     form.append("registration_type", registration_type);
+    form.append("semester_type", semester_type);
     if (old_course) form.append("old_course", old_course);
 
     setLoading(true);
@@ -175,21 +180,20 @@ export default function StudentCourses() {
       if (res.status === 200) {
         setNewCourse({
           semester_id: null,
-          semester_type: null,
-          semester_no: null,
           courseslot_id: null,
           course_id: null,
           academic_year: null,
           registration_type: null,
           old_course: null,
+          semester_type: null,
         });
         showNotification({
           title: "Course Added",
           message: "Course has been added successfully",
           color: "green",
         });
-        setAddModalOpen(false);
         await handleGetCourses();
+        setAddModalOpen(false);
       }
     } catch (err) {
       setError(err.response?.data?.detail || err.message || "Add failed");
@@ -198,35 +202,18 @@ export default function StudentCourses() {
     }
   };
 
-  const handleSemesterSelect = async (val) => {
-    clearError();
-    if (!val) return;
-    const semObj = JSON.parse(val);
-    // console.log(studentData.semester_list);
-    
-  let semesterId = semObj.no;
-  if (studentData && studentData.semester_list) {
-    const found = studentData.semester_list.find(
-      (s) => s.semester_no == semObj.no
-    );
-    if (found) {
-      semesterId = found.id;
-    }
-  }
+  const handleSemChange = async (semId) => {
     setNewCourse((p) => ({
-    ...p,
-    semester_id: semesterId,
-    semester_no: semObj.no, 
-    semester_type: semObj.type,
-    courseslot_id: null,
-    course_id: null,
-  }));
+      ...p,
+      semester_id: semId,
+      courseslot_id: null,
+      course_id: null,
+    }));
     setSlotCourses([]);
-    setSemSlots([]);
     const token = localStorage.getItem("authToken");
     try {
       const { data } = await axios.get(
-        `${getCourseSlotsRoute}?semester_id=${semesterId}`,
+        `${getCourseSlotsRoute}?semester_id=${semId}`,
         { headers: { Authorization: `Token ${token}` } }
       );
       setSemSlots(data);
@@ -249,6 +236,7 @@ export default function StudentCourses() {
     }
   };
 
+  // filter by both semester number and type
   const filteredDetails =
     studentData?.details.filter(
       (c) =>
@@ -373,13 +361,12 @@ export default function StudentCourses() {
         <Select
           label="Semester"
           placeholder="Select semester"
-          data={semesterOptions}
-          value={
-          newCourse.semester_no && newCourse.semester_type
-          ? JSON.stringify({ no: newCourse.semester_no, type: newCourse.semester_type })
-          : ""
-        }
-          onChange={handleSemesterSelect}
+          data={studentData?.semester_list.map((s) => ({
+            value: String(s.id),
+            label: `Semester ${s.semester_no}`,
+          }))}
+          value={newCourse.semester_id}
+          onChange={handleSemChange}
           mb="sm"
         />
         <Select
@@ -390,7 +377,7 @@ export default function StudentCourses() {
             label: s.name,
           }))}
           value={newCourse.courseslot_id}
-          onChange={(v) => handleSlotChange(v)}
+          onChange={handleSlotChange}
           mb="sm"
           disabled={!newCourse.semester_id}
         />
@@ -421,6 +408,16 @@ export default function StudentCourses() {
           value={newCourse.registration_type}
           onChange={(v) =>
             setNewCourse((p) => ({ ...p, registration_type: v }))
+          }
+          mb="md"
+        />
+        <Select
+          label="Semester Type"
+          placeholder="Select type"
+          data={["Odd Semester", "Even Semester", "Summer Semester"]}
+          value={newCourse.semester_type}
+          onChange={(v) =>
+            setNewCourse((p) => ({ ...p, semester_type: v }))
           }
           mb="md"
         />

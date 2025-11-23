@@ -24,12 +24,15 @@ import StudentAddDropReplace from "./StudentAddDropReplace";
 import AdminReplacementDashboard from "./AdminReplacementDashboard";
 import StudentCalendar from "./StudentCalendar";
 import AdminStudentDashboard from "./AdminStudentDashboard";
-import StudentCourseFeedbackForm from "./FeedbackForm/StudentCourseFeedbackForm";
-import AdminFeedbackView from "./FeedbackForm/AdminFeedbackView";
-import AdminBatchChange from "./AdminBatchChange";
-import AdminPromoteSemester from "./AdminPromoteSemester";
-import InstructorDashboard from "./FeedbackForm/InstructorDashboard";
-
+import StudentThesisPage from "./StudentThesisPage";
+import SupervisorDashboard from "./SupervisorDashboard";
+import DeanDashboard from "./DeanDashboard";
+import HODDashboard from "./HODDashboard";
+import StudentSeminarPage from "./StudentSeminarPage";
+import RPCDashboardPage from "./RPCDashboardPage";
+import  StudentThesisSubmissionUploadForm  from "./ThesisSubmission/StudentThesisSubmissionUploadForm";
+import  DirectorDashboard  from "./ThesisSubmission/DirectorDashboard";
+import SupervisorDashboardSub from "./ThesisSubmission/SupervisorDashboardSub";
 function AcademicPage() {
   const [activeTab, setActiveTab] = useState("0");
   const role = useSelector((state) => state.user.role);
@@ -54,9 +57,6 @@ function AcademicPage() {
       { title: "Backlog Mapping" },
       { title: "Replacement Allocation" },
       { title: "Student Dashboard"},
-      { title: "Feedback Responses"},
-      { title: "Batch/Branch Change"},
-      { title: "Promote Students"},
     ];
     tabComponents = [
       StudentCourses,
@@ -68,10 +68,7 @@ function AcademicPage() {
       AllotCourses,
       AcadCourseBacklogMapping,
       AdminReplacementDashboard,
-      AdminStudentDashboard,
-      AdminFeedbackView,
-      AdminBatchChange,
-      AdminPromoteSemester
+      AdminStudentDashboard
     ];
   } else if (role === "student") {
     tabItems = [
@@ -82,7 +79,9 @@ function AcademicPage() {
       { title: "Final-Registration" },
       { title: "Swayam Registration" },
       { title: "Add / Drop" },
-      // { title: "Feedback Form" },
+      { title: "Thesis Registration" },
+      { title: "Seminar" },
+      { title: "Student Thesis Submission" },
     ];
     tabComponents = [
       RegisteredCourses,
@@ -92,16 +91,24 @@ function AcademicPage() {
       FinalRegistration,
       SwayamRegistration,
       StudentAddDropReplace,
-      // StudentCourseFeedbackForm
+      StudentThesisPage, 
+      StudentSeminarPage,
+      StudentThesisSubmissionUploadForm
     ];
+  } else if (role === "Dean Academic"){
+    tabItems = [{ title: "Thesis"}, { title: "Thesis Submission List"}];
+    tabComponents = [DeanDashboard, DirectorDashboard];
+  } else if (role && role.startsWith("HOD")){
+    tabItems = [{ title: "Thesis"}];
+    tabComponents = [HODDashboard];
   } else if (
     role === "faculty" ||
     role === "Associate Professor" ||
     role === "Assistant Professor" ||
     role === "Professor"
   ) {
-    tabItems = [{ title: "View Roll List"},{title: "TA management"}, {title: "Course Feedback"}];
-    tabComponents = [ViewRollList, Faculty_TA_Dashboard, InstructorDashboard];
+    tabItems = [{ title: "View Roll List"},{title: "TA management"},{title: "Thesis Supervisor"}, { title: "Seminar" }, { title: "Supervisor Thesis Examinar" }];
+    tabComponents = [ViewRollList, Faculty_TA_Dashboard, SupervisorDashboard, RPCDashboardPage, SupervisorDashboardSub];
   } else {
     tabItems = [{ title: "Registered Courses" },];
     tabComponents = [RegisteredCourses];
